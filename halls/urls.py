@@ -5,9 +5,14 @@ from . import views
 
 urlpatterns = [
     path('', views.home, name='home'),
+    path('dashboard', views.dashboard, name='dashboard'),
     # AUTH
     path('signup', views.SignUp.as_view(), name='signup'),
     path('login', auth_views.LoginView.as_view(), name='login'),
     path('logout', auth_views.LogoutView.as_view(), name='logout'),
+    # HALL
     path('halloffame/create', views.CreateHall.as_view(), name='create_hall'),
+    path('halloffame/<int:pk>', views.DetailHall.as_view(), name='detail_hall'),
+    path('halloffame/<int:pk>/update', views.UpdateHall.as_view(), name='update_hall'),
+    path('halloffame/<int:pk>/delete', views.DeleteHall.as_view(), name='delete_hall'),
 ]
