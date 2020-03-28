@@ -1,27 +1,61 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="col-md-8 offset-md-2">
-    <h2 class="text-center">Add Video</h2>
-    <form method="post">
-        {% csrf_token %}
-        {% load widget_tweaks %}
-        
-        {% for field in form %}
-            <div class="form-group {% if field.errors %} alert alert-danger {% endif %}">
-                {{ field.errors }}
-                {{ field.label_tag }}
-                {% render_field field class="form-control" %}
+<div class="container">
+    <div class="col-md-8 offset-md-2">
+        <h2 class="text-center">Add Video to {{ hall.title }}</h2>
+        <form method="post">
+            {% csrf_token %}
+            {% load widget_tweaks %}
+            
+            {% for field in form %}
+                <div class="form-group {% if field.errors %} alert alert-danger {% endif %}">
+                    {{ field.errors }}
+                    {{ field.label_tag }}
+                    {% render_field field class="form-control" %}
+                </div>
+            {% endfor %}
+    
+    
+            <button type="submit" class="btn btn-primary btn-block">Add</button>
+        </form>
+        <br>
+        <h3>Or...</h3>
+        <form>
+            <div class="form-group">
+                {% for field in search_form %}
+                    {{ field.label_tag }}
+                    {% render_field field class="form-control" %}
+                {% endfor %}
             </div>
-        {% endfor %}
+        </form>
+    </div>
+    <div id="search_results"></div>
+    <script>
+        var delayTimer;
+        $('#id_search_term').keyup(function() {
+            clearTimeout(delayTimer);
+            $('#search_results').text('Loading...');
+            delayTimer = setTimeout(function() {
+                var text = $('#id_search_term').val();
+                $.ajax({
+                    url: '/video/search',
+                    data: {
+                        'search_term': text
+                    },
+                    dataType: 'json',
+                    success: function(data) {
+                        var results = ''
+                        $('#search_results').text('');
+                        data['items'].forEach(function() {
+                            results += video['snippet']['title']
+                        });
 
-
-        <button type="submit" class="btn btn-primary">Add</button>
-    </form>
-    <br>
-    <h3>Or...</h3>
-    <form>
-        {{ search_form }}
-    </form>
+                        $('#search_results').append(results);
+                    }
+                });
+            }, 1000);
+        });
+    </script>
 </div>
 {% endblock %}
