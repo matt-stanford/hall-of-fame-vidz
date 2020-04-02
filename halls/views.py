@@ -13,11 +13,18 @@ import urllib
 YOUTUBE_API_KEY = 'AIzaSyD5biMpq2E5HVymRCSlH3Ti6batIJVZPvg'
 
 def home(request):
-    return render(request, 'halls/home.html')
+    recent_halls = Hall.objects.all().order_by('-id')[:3]
+    popular_halls = [Hall.objects.get(pk=2),Hall.objects.get(pk=3),Hall.objects.get(pk=4)]
+    context = {
+        'recent_halls': recent_halls,
+        'popular_halls': popular_halls
+    }
+    return render(request, 'halls/home.html', context)
 
 
 def dashboard(request):
-    return render(request, 'halls/dashboard.html')
+    halls = Hall.objects.filter(user=request.user)
+    return render(request, 'halls/dashboard.html', {'halls': halls})
 
 
 def add_video(request, pk):
@@ -56,6 +63,12 @@ def add_video(request, pk):
 
     return render(request, 'halls/add_video.html', context)
 
+
+class DeleteVideo(generic.DeleteView):
+    model = Video
+    success_url = reverse_lazy('dashboard')
+    template_name = 'halls/delete_video.html'
+
 def video_search(request):
     search_form = SearchForm(request.GET)
     if search_form.is_valid():
@@ -81,7 +94,7 @@ class SignUp(generic.CreateView):
 class CreateHall(generic.CreateView):
     model = Hall
     fields = ('title',)
-    success_url = reverse_lazy('home')
+    success_url = reverse_lazy('dashboard')
     template_name = 'halls/create_hall.html'
 
     def form_valid(self, form):
